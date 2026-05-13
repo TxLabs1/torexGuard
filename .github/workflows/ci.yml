@@ -68,6 +68,15 @@ jobs:
           extensions: mbstring, intl, pdo, pdo_mysql, redis, bcmath, zip, gd, opcache
           coverage: none
           tools: composer:v2
+        env:
+          # Prevent the action from auto-configuring Composer with the workflow's
+          # short-lived JWT (which Composer's BaseIO rejects as "invalid characters").
+          COMPOSER_AUTH: ""
+
+      - name: Clear stale Composer auth
+        run: |
+          composer config --global --unset github-oauth.github.com 2>/dev/null || true
+          composer config --global --unset gitlab-token 2>/dev/null || true
 
       - name: Cache composer
         uses: actions/cache@v4
@@ -95,7 +104,7 @@ jobs:
         run: php artisan migrate --force
 
       - name: PHPUnit / Pest
-        run: php artisan test --parallel --processes=2
+        run: php artisan test
 
   # ──────────────────────────────────────────────────────────────
   # Go agent: vet, test, build matrix
