@@ -34,8 +34,8 @@ class ServerController extends Controller
 
         $validated = $request->validate([
             'project_id' => ['required', 'integer', 'exists:projects,id'],
-            'name'       => ['required', 'string', 'max:100'],
-            'hostname'   => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:100'],
+            'hostname' => ['required', 'string', 'max:255'],
         ]);
 
         // organization_id derived from the project (which is org-scoped).
@@ -75,11 +75,11 @@ class ServerController extends Controller
         $this->authorize('view', $server);
 
         return response()->json([
-            'cpu_usage'    => $server->cpu_usage,
+            'cpu_usage' => $server->cpu_usage,
             'memory_usage' => $server->memory_usage,
-            'disk_usage'   => $server->disk_usage,
-            'status'       => $server->status,
-            'online'       => $server->isOnline(),
+            'disk_usage' => $server->disk_usage,
+            'status' => $server->status,
+            'online' => $server->isOnline(),
         ]);
     }
 }

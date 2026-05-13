@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('two_factor_secret')->nullable()->after('timezone');
             $table->boolean('two_factor_enabled')->default(false)->after('two_factor_secret');
             $table->enum('role', ['superadmin', 'admin', 'developer', 'viewer'])
-                  ->default('developer')->after('two_factor_enabled');
+                ->default('developer')->after('two_factor_enabled');
             $table->timestamp('last_login_at')->nullable()->after('role');
             $table->string('last_login_ip')->nullable()->after('last_login_at');
             $table->boolean('is_active')->default(true)->after('last_login_ip');

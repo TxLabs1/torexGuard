@@ -61,28 +61,28 @@ class Threat extends Model
 
     public function severityColor(): string
     {
-        return match($this->severity) {
+        return match ($this->severity) {
             'critical' => '#ff3366',
-            'high'     => '#ff6b35',
-            'medium'   => '#ffd700',
-            'low'      => '#00ff88',
-            default    => '#aaaaaa',
+            'high' => '#ff6b35',
+            'medium' => '#ffd700',
+            'low' => '#00ff88',
+            default => '#aaaaaa',
         };
     }
 
     public function severityBadgeClass(): string
     {
-        return match($this->severity) {
+        return match ($this->severity) {
             'critical' => 'badge-critical',
-            'high'     => 'badge-high',
-            'medium'   => 'badge-medium',
-            'low'      => 'badge-low',
-            default    => 'badge-secondary',
+            'high' => 'badge-high',
+            'medium' => 'badge-medium',
+            'low' => 'badge-low',
+            default => 'badge-secondary',
         };
     }
 
     public static function generateThreatId(): string
     {
-        return 'THR-' . strtoupper(substr(md5(uniqid()), 0, 8));
+        return 'THR-'.strtoupper(substr(md5(uniqid()), 0, 8));
     }
 }

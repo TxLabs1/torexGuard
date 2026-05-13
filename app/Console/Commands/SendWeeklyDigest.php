@@ -21,7 +21,7 @@ class SendWeeklyDigest extends Command
         OrganizationContext::asSystem();
 
         $from = now()->subWeek();
-        $to   = now();
+        $to = now();
 
         Organization::with('users', 'notificationSetting')->chunkById(50, function ($orgs) use ($from, $to) {
             foreach ($orgs as $org) {
@@ -30,16 +30,16 @@ class SendWeeklyDigest extends Command
                     continue;
                 }
 
-                $threats   = Threat::where('organization_id', $org->id)->whereBetween('detected_at', [$from, $to]);
+                $threats = Threat::where('organization_id', $org->id)->whereBetween('detected_at', [$from, $to]);
                 $stats = [
-                    'from'             => $from->toDateString(),
-                    'to'               => $to->toDateString(),
-                    'threats'          => (clone $threats)->count(),
-                    'critical'         => (clone $threats)->where('severity', 'critical')->count(),
-                    'active'           => Threat::where('organization_id', $org->id)->where('status', 'active')->count(),
-                    'resolved'         => (clone $threats)->where('status', 'resolved')->count(),
-                    'servers_online'   => Server::where('organization_id', $org->id)->where('status', 'online')->count(),
-                    'servers_offline'  => Server::where('organization_id', $org->id)->where('status', 'offline')->count(),
+                    'from' => $from->toDateString(),
+                    'to' => $to->toDateString(),
+                    'threats' => (clone $threats)->count(),
+                    'critical' => (clone $threats)->where('severity', 'critical')->count(),
+                    'active' => Threat::where('organization_id', $org->id)->where('status', 'active')->count(),
+                    'resolved' => (clone $threats)->where('status', 'resolved')->count(),
+                    'servers_online' => Server::where('organization_id', $org->id)->where('status', 'online')->count(),
+                    'servers_offline' => Server::where('organization_id', $org->id)->where('status', 'offline')->count(),
                 ];
 
                 if ($org->users->isNotEmpty()) {

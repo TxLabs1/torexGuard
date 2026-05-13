@@ -28,11 +28,11 @@ class AlertCreated implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'id'       => $this->alert->id,
-            'title'    => $this->alert->title,
+            'id' => $this->alert->id,
+            'title' => $this->alert->title,
             'severity' => $this->alert->severity,
-            'message'  => $this->alert->message,
-            'at'       => $this->alert->created_at->toIso8601String(),
+            'message' => $this->alert->message,
+            'at' => $this->alert->created_at->toIso8601String(),
         ];
     }
 }

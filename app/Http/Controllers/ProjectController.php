@@ -16,6 +16,7 @@ class ProjectController extends Controller
         $projects = Project::with(['servers'])
             ->where('organization_id', $org?->id)
             ->latest()->paginate(12);
+
         return view('projects.index', compact('projects'));
     }
 
@@ -27,9 +28,9 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:100',
+            'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:500',
-            'type'        => 'required|in:laravel,python,node,other',
+            'type' => 'required|in:laravel,python,node,other',
             'environment' => 'required|in:production,staging,development',
         ]);
 
@@ -39,9 +40,9 @@ class ProjectController extends Controller
         $project = new Project([
             ...$validated,
             'organization_id' => $org->id,
-            'user_id'         => Auth::id(),
-            'slug'            => Str::slug($validated['name']).'-'.Str::random(6),
-            'status'          => 'active',
+            'user_id' => Auth::id(),
+            'slug' => Str::slug($validated['name']).'-'.Str::random(6),
+            'status' => 'active',
         ]);
         $project->save();
 
@@ -51,7 +52,7 @@ class ProjectController extends Controller
         // then they're gone forever.
         return redirect()->route('projects.show', $project)
             ->with('success', 'Project created. Copy the API key below now — it will not be shown again.')
-            ->with('plaintext_api_key',    $plaintext['api_key'])
+            ->with('plaintext_api_key', $plaintext['api_key'])
             ->with('plaintext_api_secret', $plaintext['api_secret']);
     }
 
@@ -59,7 +60,7 @@ class ProjectController extends Controller
     {
         $this->authorizeOrgAccess($project->organization_id);
 
-        $project->load(['servers.agent', 'threats' => fn($q) => $q->latest()->take(10)]);
+        $project->load(['servers.agent', 'threats' => fn ($q) => $q->latest()->take(10)]);
         $recentScans = ScanResult::where('project_id', $project->id)->latest()->take(5)->get();
 
         return view('projects.show', compact('project', 'recentScans'));
@@ -68,6 +69,7 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $this->authorizeOrgAccess($project->organization_id);
+
         return view('projects.edit', compact('project'));
     }
 
@@ -76,7 +78,7 @@ class ProjectController extends Controller
         $this->authorizeOrgAccess($project->organization_id);
 
         $validated = $request->validate([
-            'name'        => 'required|string|max:100',
+            'name' => 'required|string|max:100',
             'description' => 'nullable|string|max:500',
             'environment' => 'required|in:production,staging,development',
         ]);
@@ -89,6 +91,7 @@ class ProjectController extends Controller
     {
         $this->authorizeOrgAccess($project->organization_id);
         $project->delete();
+
         return redirect()->route('projects.index')->with('success', 'Project deleted');
     }
 
@@ -99,10 +102,10 @@ class ProjectController extends Controller
         $plaintext = $project->issueApiKey();
 
         return response()->json([
-            'success'    => true,
-            'api_key'    => $plaintext['api_key'],
+            'success' => true,
+            'api_key' => $plaintext['api_key'],
             'api_secret' => $plaintext['api_secret'],
-            'note'       => 'Copy this value now. It will not be shown again.',
+            'note' => 'Copy this value now. It will not be shown again.',
         ]);
     }
 

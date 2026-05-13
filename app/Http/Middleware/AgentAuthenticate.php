@@ -36,8 +36,8 @@ class AgentAuthenticate
         // shows "last seen" without requiring a heartbeat round-trip.
         $agent->forceFill(['last_heartbeat_at' => now()])->saveQuietly();
 
-        $request->attributes->set('agent',         $agent);
-        $request->attributes->set('agent_server',  $agent->server);
+        $request->attributes->set('agent', $agent);
+        $request->attributes->set('agent_server', $agent->server);
         $request->attributes->set('agent_project', $agent->project);
 
         return $next($request);

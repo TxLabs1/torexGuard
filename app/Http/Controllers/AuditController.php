@@ -49,7 +49,7 @@ class AuditController extends Controller
         }
 
         $activities = $query->paginate(40)->withQueryString();
-        $logNames   = Activity::select('log_name')->distinct()->pluck('log_name')->filter()->values();
+        $logNames = Activity::select('log_name')->distinct()->pluck('log_name')->filter()->values();
 
         return view('audit.index', compact('activities', 'logNames'));
     }
@@ -63,6 +63,7 @@ class AuditController extends Controller
         if (method_exists($user, 'hasPermissionTo') && $user->hasPermissionTo('view audit log')) {
             return true;
         }
+
         return $user->isAdmin();
     }
 }

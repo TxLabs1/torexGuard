@@ -24,9 +24,9 @@ class ThreatController extends Controller
             $search = $request->string('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('file_path', 'like', "%{$search}%")
-                  ->orWhere('threat_id', 'like', "%{$search}%")
-                  ->orWhere('source_ip', 'like', "%{$search}%");
+                    ->orWhere('file_path', 'like', "%{$search}%")
+                    ->orWhere('threat_id', 'like', "%{$search}%")
+                    ->orWhere('source_ip', 'like', "%{$search}%");
             });
         }
 
@@ -39,12 +39,12 @@ class ThreatController extends Controller
         $threats = $query->latest('detected_at')->paginate(20);
         $servers = Server::query()->get(['id', 'name', 'hostname']);
 
-        $base   = Threat::query();
+        $base = Threat::query();
         $counts = [
             'critical' => (clone $base)->where('severity', 'critical')->count(),
-            'high'     => (clone $base)->where('severity', 'high')->count(),
-            'medium'   => (clone $base)->where('severity', 'medium')->count(),
-            'low'      => (clone $base)->where('severity', 'low')->count(),
+            'high' => (clone $base)->where('severity', 'high')->count(),
+            'medium' => (clone $base)->where('severity', 'medium')->count(),
+            'low' => (clone $base)->where('severity', 'low')->count(),
         ];
 
         return view('threats.index', compact('threats', 'servers', 'counts'));
@@ -66,9 +66,9 @@ class ThreatController extends Controller
         $threat->update(['status' => 'resolved', 'resolved_at' => now(), 'resolved_by' => Auth::id()]);
         ThreatLog::create([
             'threat_id' => $threat->id,
-            'user_id'   => Auth::id(),
-            'action'    => 'resolved',
-            'note'      => 'Manually resolved',
+            'user_id' => Auth::id(),
+            'action' => 'resolved',
+            'note' => 'Manually resolved',
         ]);
 
         return response()->json(['success' => true, 'message' => 'Threat marked as resolved']);
@@ -90,8 +90,8 @@ class ThreatController extends Controller
         $threat->update(['status' => 'false_positive']);
         ThreatLog::create([
             'threat_id' => $threat->id,
-            'user_id'   => Auth::id(),
-            'action'    => 'false_positive',
+            'user_id' => Auth::id(),
+            'action' => 'false_positive',
         ]);
 
         return response()->json(['success' => true, 'message' => 'Marked as false positive']);
@@ -104,8 +104,8 @@ class ThreatController extends Controller
         $threat->update(['status' => 'investigating']);
         ThreatLog::create([
             'threat_id' => $threat->id,
-            'user_id'   => Auth::id(),
-            'action'    => 'investigating',
+            'user_id' => Auth::id(),
+            'action' => 'investigating',
         ]);
 
         return response()->json(['success' => true, 'message' => 'Threat under investigation']);

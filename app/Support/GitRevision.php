@@ -40,8 +40,10 @@ class GitRevision
             if (is_readable($refPath)) {
                 return substr(trim((string) @file_get_contents($refPath)), 0, 12);
             }
+
             return null;
         }
+
         return substr($ref, 0, 12) ?: null;
     }
 }

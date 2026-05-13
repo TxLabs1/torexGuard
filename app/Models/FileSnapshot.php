@@ -34,8 +34,13 @@ class FileSnapshot extends Model
     public function fileSizeHuman(): string
     {
         $size = $this->file_size;
-        if ($size < 1024) return $size . ' B';
-        if ($size < 1048576) return round($size / 1024, 1) . ' KB';
-        return round($size / 1048576, 1) . ' MB';
+        if ($size < 1024) {
+            return $size.' B';
+        }
+        if ($size < 1048576) {
+            return round($size / 1024, 1).' KB';
+        }
+
+        return round($size / 1048576, 1).' MB';
     }
 }

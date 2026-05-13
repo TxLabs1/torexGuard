@@ -20,6 +20,7 @@ Broadcast::channel('project.{projectId}', function ($user, $projectId) {
     OrganizationContext::asSystem();
     $project = Project::find($projectId);
     OrganizationContext::reset();
+
     return $project
         ? $user->organizations()->where('organizations.id', $project->organization_id)->exists()
         : false;
@@ -29,6 +30,7 @@ Broadcast::channel('server.{serverId}', function ($user, $serverId) {
     OrganizationContext::asSystem();
     $server = Server::find($serverId);
     OrganizationContext::reset();
+
     return $server
         ? $user->organizations()->where('organizations.id', $server->organization_id)->exists()
         : false;

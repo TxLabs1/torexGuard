@@ -42,13 +42,13 @@ class SecureHeaders
         $csp = config('security-headers.csp', $this->defaultCsp());
 
         return [
-            'X-Frame-Options'           => 'DENY',
-            'X-Content-Type-Options'    => 'nosniff',
-            'Referrer-Policy'           => 'strict-origin-when-cross-origin',
-            'Permissions-Policy'        => 'geolocation=(), microphone=(), camera=(), payment=()',
-            'Content-Security-Policy'   => $csp,
-            'Cross-Origin-Opener-Policy'    => 'same-origin',
-            'Cross-Origin-Resource-Policy'  => 'same-origin',
+            'X-Frame-Options' => 'DENY',
+            'X-Content-Type-Options' => 'nosniff',
+            'Referrer-Policy' => 'strict-origin-when-cross-origin',
+            'Permissions-Policy' => 'geolocation=(), microphone=(), camera=(), payment=()',
+            'Content-Security-Policy' => $csp,
+            'Cross-Origin-Opener-Policy' => 'same-origin',
+            'Cross-Origin-Resource-Policy' => 'same-origin',
             // HSTS only when actually served over HTTPS to avoid breaking dev.
             'Strict-Transport-Security' => $isProd && $request->isSecure()
                 ? 'max-age=31536000; includeSubDomains; preload'

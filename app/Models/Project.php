@@ -23,9 +23,9 @@ class Project extends Model
     protected $hidden = ['api_key_hash', 'api_secret_hash'];
 
     protected $casts = [
-        'last_scan_at'  => 'datetime',
+        'last_scan_at' => 'datetime',
         'last_event_at' => 'datetime',
-        'settings'      => 'array',
+        'settings' => 'array',
     ];
 
     public function user()
@@ -95,12 +95,12 @@ class Project extends Model
      */
     public function issueApiKey(): array
     {
-        $key    = self::generateApiKey();
+        $key = self::generateApiKey();
         $secret = self::generateApiSecret();
 
         $this->forceFill([
-            'api_key_hash'    => hash('sha256', $key),
-            'api_key_prefix'  => mb_substr($key, 0, 11),
+            'api_key_hash' => hash('sha256', $key),
+            'api_key_prefix' => mb_substr($key, 0, 11),
             'api_secret_hash' => hash('sha256', $secret),
         ])->save();
 

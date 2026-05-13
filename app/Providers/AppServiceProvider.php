@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\GeoIpService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -12,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(\App\Services\GeoIpService::class);
+        $this->app->singleton(GeoIpService::class);
     }
 
     public function boot(): void
@@ -39,7 +40,9 @@ class AppServiceProvider extends ServiceProvider
         // Agent runtime: per-token 1000/min covers heartbeats + event batches.
         RateLimiter::for('agent', function (Request $request) {
             $agent = $request->attributes->get('agent');
-            $key   = $agent?->id ?? $request->ip();
+            $key = is_object($agent) && property_exists($agent, 'id')
+                ? $agent->id
+                : $request->ip();
 
             return Limit::perMinute(1000)->by("agent:{$key}");
         });

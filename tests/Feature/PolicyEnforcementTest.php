@@ -23,37 +23,37 @@ class PolicyEnforcementTest extends TestCase
         $orgB = Organization::create(['name' => 'B', 'slug' => 'b']);
 
         $alice = User::factory()->create();
-        $bob   = User::factory()->create();
+        $bob = User::factory()->create();
         $orgA->users()->attach($alice->id, ['role' => 'admin']);
         $orgB->users()->attach($bob->id, ['role' => 'admin']);
 
         $projectB = Project::create([
             'organization_id' => $orgB->id,
-            'user_id'         => $bob->id,
-            'name'            => 'B-project',
-            'slug'            => 'b-project',
-            'status'          => 'active',
+            'user_id' => $bob->id,
+            'name' => 'B-project',
+            'slug' => 'b-project',
+            'status' => 'active',
         ]);
 
         $serverB = Server::create([
             'organization_id' => $orgB->id,
-            'project_id'      => $projectB->id,
-            'name'            => 'b-srv',
-            'hostname'        => 'b-srv',
-            'os'              => 'linux',
-            'status'          => 'online',
+            'project_id' => $projectB->id,
+            'name' => 'b-srv',
+            'hostname' => 'b-srv',
+            'os' => 'linux',
+            'status' => 'online',
         ]);
 
         $threatB = Threat::create([
-            'threat_id'        => Threat::generateThreatId(),
+            'threat_id' => Threat::generateThreatId(),
             'organization_id' => $orgB->id,
-            'project_id'      => $projectB->id,
-            'server_id'       => $serverB->id,
-            'type'            => 'malware',
-            'severity'        => 'high',
-            'title'           => 'evil',
-            'status'          => 'active',
-            'detected_at'     => now(),
+            'project_id' => $projectB->id,
+            'server_id' => $serverB->id,
+            'type' => 'malware',
+            'severity' => 'high',
+            'title' => 'evil',
+            'status' => 'active',
+            'detected_at' => now(),
         ]);
 
         OrganizationContext::reset();

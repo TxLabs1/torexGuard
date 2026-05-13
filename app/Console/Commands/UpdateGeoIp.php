@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 class UpdateGeoIp extends Command
 {
     protected $signature = 'geoip:update {--force : redownload even if the DB is fresh}';
+
     protected $description = 'Download the latest GeoLite2-City.mmdb from MaxMind';
 
     public function handle(): int
@@ -16,12 +17,14 @@ class UpdateGeoIp extends Command
         $key = config('geoip.license_key');
         if (! $key) {
             $this->error('GEOIP_LICENSE_KEY is not set in .env. Get a free key at https://www.maxmind.com/en/geolite2/signup');
+
             return self::FAILURE;
         }
 
         $target = config('geoip.database_path');
         if (! $this->option('force') && is_file($target) && filemtime($target) > now()->subDays(7)->getTimestamp()) {
             $this->info("Database at {$target} is fresh (<7 days old). Skipping. Use --force to override.");
+
             return self::SUCCESS;
         }
 
@@ -34,6 +37,7 @@ class UpdateGeoIp extends Command
         $response = Http::withOptions(['sink' => $tmpTar, 'timeout' => 180])->get($url);
         if (! $response->successful()) {
             $this->error("download failed: HTTP {$response->status()}");
+
             return self::FAILURE;
         }
 
@@ -53,6 +57,7 @@ class UpdateGeoIp extends Command
 
         if (! $mmdb) {
             $this->error('extracted archive contained no .mmdb file');
+
             return self::FAILURE;
         }
 
@@ -64,6 +69,7 @@ class UpdateGeoIp extends Command
         @unlink($tarPath);
 
         $this->info("✅ GeoIP database updated at {$target}");
+
         return self::SUCCESS;
     }
 }

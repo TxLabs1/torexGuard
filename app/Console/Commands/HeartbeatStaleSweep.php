@@ -26,7 +26,7 @@ class HeartbeatStaleSweep extends Command
         OrganizationContext::asSystem();
 
         $threshold = (int) $this->option('threshold');
-        $cutoff    = now()->subSeconds($threshold);
+        $cutoff = now()->subSeconds($threshold);
 
         $marked = 0;
 
@@ -34,7 +34,7 @@ class HeartbeatStaleSweep extends Command
             ->where('status', '!=', 'offline')
             ->where(function ($q) use ($cutoff) {
                 $q->whereNull('last_heartbeat_at')
-                  ->orWhere('last_heartbeat_at', '<', $cutoff);
+                    ->orWhere('last_heartbeat_at', '<', $cutoff);
             })
             ->chunkById(200, function ($servers) use (&$marked) {
                 foreach ($servers as $server) {
@@ -52,6 +52,7 @@ class HeartbeatStaleSweep extends Command
             });
 
         $this->info("heartbeat sweep marked {$marked} server(s) offline");
+
         return self::SUCCESS;
     }
 }

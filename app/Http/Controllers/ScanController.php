@@ -28,13 +28,13 @@ class ScanController extends Controller
 
         // Queue a command for the agent. It long-polls /api/v1/agent/commands/pending.
         Action::create([
-            'server_id'    => $server->id,
-            'project_id'   => $server->project_id,
+            'server_id' => $server->id,
+            'project_id' => $server->project_id,
             'triggered_by' => Auth::id(),
-            'type'         => 'send_alert', // re-using existing enum; full force_scan added in p3 enum extension
-            'status'       => 'pending',
+            'type' => 'send_alert', // re-using existing enum; full force_scan added in p3 enum extension
+            'status' => 'pending',
             'is_automated' => false,
-            'target'       => 'force_scan',
+            'target' => 'force_scan',
             'dispatched_at' => now(),
         ]);
 

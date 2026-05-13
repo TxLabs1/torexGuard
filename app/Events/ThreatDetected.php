@@ -3,7 +3,6 @@
 namespace App\Events;
 
 use App\Models\Threat;
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -29,14 +28,14 @@ class ThreatDetected implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'id'        => $this->threat->id,
+            'id' => $this->threat->id,
             'threat_id' => $this->threat->threat_id,
-            'severity'  => $this->threat->severity,
-            'type'      => $this->threat->type,
-            'title'     => $this->threat->title,
-            'server'    => $this->threat->server?->hostname,
-            'project'   => $this->threat->project?->name,
-            'detected'  => $this->threat->detected_at?->toIso8601String(),
+            'severity' => $this->threat->severity,
+            'type' => $this->threat->type,
+            'title' => $this->threat->title,
+            'server' => $this->threat->server?->hostname,
+            'project' => $this->threat->project?->name,
+            'detected' => $this->threat->detected_at?->toIso8601String(),
         ];
     }
 }

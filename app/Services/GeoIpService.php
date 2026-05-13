@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use GeoIp2\Database\Reader;
+use GeoIp2\Exception\AddressNotFoundException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -51,17 +52,19 @@ class GeoIpService
         return Cache::remember("geoip:{$ip}", now()->addDay(), function () use ($ip, $empty) {
             try {
                 $record = $this->reader->city($ip);
+
                 return [
                     'country_code' => $record->country->isoCode,
                     'country_name' => $record->country->name,
-                    'city'         => $record->city->name,
-                    'latitude'     => $record->location->latitude,
-                    'longitude'    => $record->location->longitude,
+                    'city' => $record->city->name,
+                    'latitude' => $record->location->latitude,
+                    'longitude' => $record->location->longitude,
                 ];
-            } catch (\GeoIp2\Exception\AddressNotFoundException) {
+            } catch (AddressNotFoundException) {
                 return $empty;
             } catch (\Throwable $e) {
                 Log::warning('geoip lookup failed', ['ip' => $ip, 'err' => $e->getMessage()]);
+
                 return $empty;
             }
         });

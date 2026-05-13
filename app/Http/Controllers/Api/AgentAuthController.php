@@ -15,17 +15,17 @@ class AgentAuthController
     {
         $data = $request->validate([
             'project_api_key' => 'required|string|max:128',
-            'hostname'        => 'required|string|max:255',
-            'os'              => 'required|string|max:64',
-            'os_version'      => 'nullable|string|max:64',
-            'arch'            => 'nullable|string|max:32',
-            'cpu_count'       => 'nullable|integer|min:0|max:65535',
-            'memory_total'    => 'nullable|integer|min:0',
-            'disk_total'      => 'nullable|integer|min:0',
-            'version'         => 'required|string|max:32',
-            'ip_address'      => 'nullable|ip',
-            'capabilities'    => 'nullable|array',
-            'capabilities.*'  => 'string|max:64',
+            'hostname' => 'required|string|max:255',
+            'os' => 'required|string|max:64',
+            'os_version' => 'nullable|string|max:64',
+            'arch' => 'nullable|string|max:32',
+            'cpu_count' => 'nullable|integer|min:0|max:65535',
+            'memory_total' => 'nullable|integer|min:0',
+            'disk_total' => 'nullable|integer|min:0',
+            'version' => 'required|string|max:32',
+            'ip_address' => 'nullable|ip',
+            'capabilities' => 'nullable|array',
+            'capabilities.*' => 'string|max:64',
         ]);
 
         $project = Project::findByApiKey($data['project_api_key']);
@@ -38,15 +38,15 @@ class AgentAuthController
             ['hostname' => $data['hostname'], 'project_id' => $project->id],
             [
                 'organization_id' => $project->organization_id,
-                'name'            => $data['hostname'],
-                'ip_address'      => $data['ip_address'] ?? $request->ip(),
-                'os'              => $data['os'],
-                'os_version'      => $data['os_version'] ?? null,
-                'arch'            => $data['arch'] ?? null,
-                'cpu_count'       => $data['cpu_count'] ?? null,
-                'memory_total'    => $data['memory_total'] ?? null,
-                'disk_total'      => $data['disk_total'] ?? null,
-                'status'          => 'online',
+                'name' => $data['hostname'],
+                'ip_address' => $data['ip_address'] ?? $request->ip(),
+                'os' => $data['os'],
+                'os_version' => $data['os_version'] ?? null,
+                'arch' => $data['arch'] ?? null,
+                'cpu_count' => $data['cpu_count'] ?? null,
+                'memory_total' => $data['memory_total'] ?? null,
+                'disk_total' => $data['disk_total'] ?? null,
+                'status' => 'online',
             ]
         );
 
@@ -55,9 +55,9 @@ class AgentAuthController
         );
 
         $agent->fill([
-            'agent_id'     => $agent->agent_id ?: 'agt_'.Str::random(16),
-            'version'      => $data['version'],
-            'status'       => 'active',
+            'agent_id' => $agent->agent_id ?: 'agt_'.Str::random(16),
+            'version' => $data['version'],
+            'status' => 'active',
             'connected_at' => now(),
             'capabilities' => $data['capabilities'] ?? [],
         ])->save();
@@ -70,10 +70,10 @@ class AgentAuthController
         $project->forceFill(['last_event_at' => now()])->save();
 
         return response()->json([
-            'agent_id'    => $agent->agent_id,
+            'agent_id' => $agent->agent_id,
             'agent_token' => $token,
-            'server_id'   => $server->id,
-            'config'      => $this->getAgentConfig($project, $agent),
+            'server_id' => $server->id,
+            'config' => $this->getAgentConfig($project, $agent),
         ]);
     }
 
@@ -108,7 +108,7 @@ class AgentAuthController
     public function getSignatures(Request $request): JsonResponse
     {
         return response()->json([
-            'version'    => '1.0.0',
+            'version' => '1.0.0',
             'updated_at' => now(),
             'signatures' => config('guard.signatures', $this->defaultSignatures()),
         ]);
@@ -119,16 +119,16 @@ class AgentAuthController
         $settings = $project->settings ?? [];
 
         return [
-            'scan_interval'        => (int) ($settings['scan_interval'] ?? 300),
-            'heartbeat_interval'   => (int) ($settings['heartbeat_interval'] ?? 60),
-            'batch_size'           => 50,
-            'monitored_paths'      => $settings['monitored_paths']
+            'scan_interval' => (int) ($settings['scan_interval'] ?? 300),
+            'heartbeat_interval' => (int) ($settings['heartbeat_interval'] ?? 60),
+            'batch_size' => 50,
+            'monitored_paths' => $settings['monitored_paths']
                 ?? config('guard.monitored_paths', ['/var/www', '/public', '/storage', '/uploads']),
-            'excluded_paths'       => $settings['excluded_paths']
+            'excluded_paths' => $settings['excluded_paths']
                 ?? ['/vendor', '/node_modules', '/.git'],
             'dangerous_extensions' => ['php', 'phtml', 'php3', 'php4', 'php5', 'py', 'rb', 'sh', 'bash'],
-            'auto_quarantine'      => (bool) ($settings['auto_quarantine'] ?? false),
-            'realtime_monitoring'  => true,
+            'auto_quarantine' => (bool) ($settings['auto_quarantine'] ?? false),
+            'realtime_monitoring' => true,
         ];
     }
 

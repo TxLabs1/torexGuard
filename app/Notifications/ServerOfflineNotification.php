@@ -25,6 +25,7 @@ class ServerOfflineNotification extends Notification implements ShouldQueue
             && in_array('server_offline', $settings->notify_on ?? ['server_offline'], true)) {
             $channels[] = 'mail';
         }
+
         return $channels;
     }
 
@@ -40,10 +41,10 @@ class ServerOfflineNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'type'      => 'server_offline',
+            'type' => 'server_offline',
             'server_id' => $this->server->id,
-            'hostname'  => $this->server->hostname,
-            'url'       => '/servers/'.$this->server->id,
+            'hostname' => $this->server->hostname,
+            'url' => '/servers/'.$this->server->id,
         ];
     }
 }

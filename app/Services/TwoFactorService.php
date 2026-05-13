@@ -33,8 +33,8 @@ class TwoFactorService
         $plain = $this->google2fa->generateSecretKey();
 
         $user->forceFill([
-            'two_factor_secret'       => $this->encrypter->encryptString($plain),
-            'two_factor_enabled'      => false,
+            'two_factor_secret' => $this->encrypter->encryptString($plain),
+            'two_factor_enabled' => false,
             'two_factor_confirmed_at' => null,
         ])->save();
 
@@ -67,8 +67,8 @@ class TwoFactorService
         $codes = collect(range(1, 8))->map(fn () => Str::lower(Str::random(10)))->all();
 
         $user->forceFill([
-            'two_factor_enabled'        => true,
-            'two_factor_confirmed_at'   => now(),
+            'two_factor_enabled' => true,
+            'two_factor_confirmed_at' => now(),
             'two_factor_recovery_codes' => array_map(fn ($c) => password_hash($c, PASSWORD_BCRYPT), $codes),
         ])->save();
 
@@ -78,9 +78,9 @@ class TwoFactorService
     public function disable(User $user): void
     {
         $user->forceFill([
-            'two_factor_enabled'        => false,
-            'two_factor_secret'         => null,
-            'two_factor_confirmed_at'   => null,
+            'two_factor_enabled' => false,
+            'two_factor_secret' => null,
+            'two_factor_confirmed_at' => null,
             'two_factor_recovery_codes' => null,
         ])->save();
     }
@@ -91,7 +91,7 @@ class TwoFactorService
     public function consumeRecoveryCode(User $user, string $code): bool
     {
         $hashes = $user->two_factor_recovery_codes ?? [];
-        $code   = trim(Str::lower($code));
+        $code = trim(Str::lower($code));
 
         foreach ($hashes as $idx => $hash) {
             if (password_verify($code, $hash)) {
@@ -99,9 +99,11 @@ class TwoFactorService
                 $user->forceFill([
                     'two_factor_recovery_codes' => array_values($hashes),
                 ])->save();
+
                 return true;
             }
         }
+
         return false;
     }
 

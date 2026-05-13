@@ -63,6 +63,6 @@ class Organization extends Model
 
     public function overallRiskScore(): int
     {
-        return (int) $this->projects()->avg('risk_score') ?? 0;
+        return (int) ($this->projects()->avg('risk_score') ?? 0);
     }
 }

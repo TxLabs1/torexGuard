@@ -28,14 +28,14 @@ class ScanCompleted implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'id'            => $this->scan->id,
-            'scan_id'       => $this->scan->scan_id,
-            'project'       => $this->scan->project?->name,
-            'server'        => $this->scan->server?->hostname,
+            'id' => $this->scan->id,
+            'scan_id' => $this->scan->scan_id,
+            'project' => $this->scan->project?->name,
+            'server' => $this->scan->server?->hostname,
             'files_scanned' => $this->scan->files_scanned,
             'threats_found' => $this->scan->threats_found,
-            'duration'      => $this->scan->duration_seconds,
-            'completed_at'  => $this->scan->completed_at?->toIso8601String(),
+            'duration' => $this->scan->duration_seconds,
+            'completed_at' => $this->scan->completed_at?->toIso8601String(),
         ];
     }
 }

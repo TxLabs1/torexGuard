@@ -31,6 +31,7 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
             if (! $user) {
                 return false;
             }
+
             // Spatie roles first, fall back to legacy enum column.
             return method_exists($user, 'hasAnyRole')
                 ? $user->hasAnyRole(['superadmin', 'admin'])

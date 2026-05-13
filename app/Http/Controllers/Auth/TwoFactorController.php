@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\TwoFactorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -66,13 +67,14 @@ class TwoFactorController extends Controller
         if (! $request->session()->has('login.2fa.user_id')) {
             return redirect()->route('login');
         }
+
         return view('auth.2fa.challenge');
     }
 
     public function verifyChallenge(Request $request)
     {
         $data = $request->validate([
-            'code'          => 'nullable|string|max:10',
+            'code' => 'nullable|string|max:10',
             'recovery_code' => 'nullable|string|max:32',
         ]);
 
@@ -80,7 +82,7 @@ class TwoFactorController extends Controller
             return redirect()->route('login');
         }
 
-        $user = \App\Models\User::findOrFail($userId);
+        $user = User::findOrFail($userId);
 
         $verified = false;
         if (! empty($data['code'])) {

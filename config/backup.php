@@ -1,5 +1,17 @@
 <?php
 
+use Spatie\Backup\Notifications\Notifiable;
+use Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification;
+use Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification;
+use Spatie\Backup\Notifications\Notifications\CleanupHasFailedNotification;
+use Spatie\Backup\Notifications\Notifications\CleanupWasSuccessfulNotification;
+use Spatie\Backup\Notifications\Notifications\HealthyBackupWasFoundNotification;
+use Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification;
+use Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays;
+use Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes;
+use Spatie\DbDumper\Compressors\GzipCompressor;
+
 return [
     'backup' => [
         'name' => env('APP_NAME', 'torex-guard'),
@@ -23,13 +35,13 @@ return [
             'databases' => ['mysql'],
         ],
 
-        'database_dump_compressor'         => Spatie\DbDumper\Compressors\GzipCompressor::class,
-        'database_dump_file_extension'     => '',
+        'database_dump_compressor' => GzipCompressor::class,
+        'database_dump_file_extension' => '',
         'database_dump_file_timestamp_format' => null,
 
         'destination' => [
             'compression_method' => ZipArchive::CM_DEFAULT,
-            'compression_level'  => 9,
+            'compression_level' => 9,
 
             'filename_prefix' => env('BACKUP_FILENAME_PREFIX', 'torex-'),
 
@@ -53,58 +65,58 @@ return [
 
     'notifications' => [
         'notifications' => [
-            \Spatie\Backup\Notifications\Notifications\BackupHasFailedNotification::class           => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFoundNotification::class   => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\CleanupHasFailedNotification::class          => ['mail'],
-            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessfulNotification::class       => [],
-            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFoundNotification::class     => [],
-            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessfulNotification::class      => [],
+            BackupHasFailedNotification::class => ['mail'],
+            UnhealthyBackupWasFoundNotification::class => ['mail'],
+            CleanupHasFailedNotification::class => ['mail'],
+            BackupWasSuccessfulNotification::class => [],
+            HealthyBackupWasFoundNotification::class => [],
+            CleanupWasSuccessfulNotification::class => [],
         ],
 
-        'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
+        'notifiable' => Notifiable::class,
         'mail' => [
-            'to'   => env('BACKUP_NOTIFICATION_EMAIL') ?: (env('MAIL_FROM_ADDRESS') ?: 'ops@example.com'),
+            'to' => env('BACKUP_NOTIFICATION_EMAIL') ?: (env('MAIL_FROM_ADDRESS') ?: 'ops@example.com'),
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS') ?: 'ops@example.com',
-                'name'    => env('MAIL_FROM_NAME', 'Torex Guard'),
+                'name' => env('MAIL_FROM_NAME', 'Torex Guard'),
             ],
         ],
         'slack' => [
             'webhook_url' => env('BACKUP_SLACK_WEBHOOK', ''),
-            'channel'     => null,
-            'username'    => null,
-            'icon'        => null,
+            'channel' => null,
+            'username' => null,
+            'icon' => null,
         ],
         'discord' => [
             'webhook_url' => '',
-            'username'    => '',
-            'avatar_url'  => '',
+            'username' => '',
+            'avatar_url' => '',
         ],
     ],
 
     'monitor_backups' => [
         [
-            'name'              => env('APP_NAME', 'torex-guard'),
-            'disks'             => array_values(array_filter([env('BACKUP_S3_DISK', 'backups')])),
-            'health_checks'     => [
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class           => 1,
-                \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class  => 50_000,
+            'name' => env('APP_NAME', 'torex-guard'),
+            'disks' => array_values(array_filter([env('BACKUP_S3_DISK', 'backups')])),
+            'health_checks' => [
+                MaximumAgeInDays::class => 1,
+                MaximumStorageInMegabytes::class => 50_000,
             ],
         ],
     ],
 
     'cleanup' => [
-        'strategy' => \Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy::class,
+        'strategy' => DefaultStrategy::class,
         'default_strategy' => [
-            'keep_all_backups_for_days'             => 7,
-            'keep_daily_backups_for_days'           => 16,
-            'keep_weekly_backups_for_weeks'         => 8,
-            'keep_monthly_backups_for_months'       => 4,
-            'keep_yearly_backups_for_years'         => 2,
+            'keep_all_backups_for_days' => 7,
+            'keep_daily_backups_for_days' => 16,
+            'keep_weekly_backups_for_weeks' => 8,
+            'keep_monthly_backups_for_months' => 4,
+            'keep_yearly_backups_for_years' => 2,
             'delete_oldest_backups_when_using_more_megabytes_than' => 50_000,
         ],
 
-        'tries'        => 5,
-        'retry_delay'  => 30,
+        'tries' => 5,
+        'retry_delay' => 30,
     ],
 ];

@@ -17,9 +17,9 @@ class Action extends Model
     ];
 
     protected $casts = [
-        'executed_at'   => 'datetime',
+        'executed_at' => 'datetime',
         'dispatched_at' => 'datetime',
-        'is_automated'  => 'boolean',
+        'is_automated' => 'boolean',
     ];
 
     public function threat()

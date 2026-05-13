@@ -18,10 +18,10 @@ class ApiToken extends Model
     ];
 
     protected $casts = [
-        'abilities'    => 'array',
+        'abilities' => 'array',
         'last_used_at' => 'datetime',
-        'expires_at'   => 'datetime',
-        'is_active'    => 'boolean',
+        'expires_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     public function user()
@@ -43,7 +43,7 @@ class ApiToken extends Model
     {
         $token = self::generateToken();
         $this->forceFill([
-            'token_hash'   => hash('sha256', $token),
+            'token_hash' => hash('sha256', $token),
             'token_prefix' => mb_substr($token, 0, 12),
         ])->save();
 

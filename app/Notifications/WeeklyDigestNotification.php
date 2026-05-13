@@ -27,12 +27,14 @@ class WeeklyDigestNotification extends Notification implements ShouldQueue
             && in_array('weekly_digest', $settings->notify_on ?? ['weekly_digest'], true)) {
             $channels[] = 'mail';
         }
+
         return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         $s = $this->stats;
+
         return (new MailMessage)
             ->subject('Torex Guard weekly digest — '.$s['from'].' to '.$s['to'])
             ->line('Threats detected: '.$s['threats'])

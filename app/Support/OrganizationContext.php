@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 class OrganizationContext
 {
     protected static ?int $currentId = null;
+
     protected static bool $systemMode = false;
 
     /** @var array<int,int|null> */
@@ -25,7 +26,7 @@ class OrganizationContext
 
     public static function setCurrent(?int $organizationId): void
     {
-        self::$currentId  = $organizationId;
+        self::$currentId = $organizationId;
         self::$systemMode = false;
     }
 
@@ -57,13 +58,13 @@ class OrganizationContext
     public static function asSystem(): void
     {
         self::$systemMode = true;
-        self::$currentId  = null;
+        self::$currentId = null;
     }
 
     public static function reset(): void
     {
-        self::$systemMode  = false;
-        self::$currentId   = null;
+        self::$systemMode = false;
+        self::$currentId = null;
         self::$userOrgCache = [];
     }
 }

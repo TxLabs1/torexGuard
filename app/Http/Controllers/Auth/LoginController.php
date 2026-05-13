@@ -22,12 +22,12 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email'    => ['required', 'email'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'string'],
         ]);
 
         $remember = $request->boolean('remember');
-        $user     = User::where('email', $credentials['email'])->first();
+        $user = User::where('email', $credentials['email'])->first();
 
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             return back()
@@ -41,8 +41,9 @@ class LoginController extends Controller
 
         if ($this->tfa->isEnabled($user)) {
             // Stash the partial-login state and ask for the second factor.
-            $request->session()->put('login.2fa.user_id',  $user->id);
+            $request->session()->put('login.2fa.user_id', $user->id);
             $request->session()->put('login.2fa.remember', $remember);
+
             return redirect()->route('login.2fa.challenge');
         }
 

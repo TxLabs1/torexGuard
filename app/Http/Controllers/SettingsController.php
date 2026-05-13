@@ -22,17 +22,19 @@ class SettingsController extends Controller
     public function updateProfile(Request $request)
     {
         $validated = $request->validate([
-            'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users,email,' . Auth::id(),
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email,'.Auth::id(),
             'timezone' => 'nullable|string',
         ]);
         Auth::user()->update($validated);
+
         return redirect()->back()->with('success', 'Profile updated');
     }
 
     public function organization()
     {
         $org = Auth::user()->organizations()->first();
+
         return view('settings.organization', compact('org'));
     }
 
@@ -41,13 +43,15 @@ class SettingsController extends Controller
         $org = Auth::user()->organizations()->first();
         $validated = $request->validate(['name' => 'required|string|max:100', 'email' => 'nullable|email']);
         $org->update($validated);
+
         return redirect()->back()->with('success', 'Organization updated');
     }
 
     public function notifications()
     {
         $org = Auth::user()->organizations()->first();
-        $settings = $org->notificationSettings ?? new NotificationSetting();
+        $settings = $org->notificationSettings ?? new NotificationSetting;
+
         return view('settings.notifications', compact('settings'));
     }
 
@@ -56,8 +60,9 @@ class SettingsController extends Controller
         $org = Auth::user()->organizations()->first();
         NotificationSetting::updateOrCreate(
             ['organization_id' => $org->id],
-            $request->only(['email_enabled','slack_enabled','slack_webhook','webhook_enabled','webhook_url'])
+            $request->only(['email_enabled', 'slack_enabled', 'slack_webhook', 'webhook_enabled', 'webhook_url'])
         );
+
         return redirect()->back()->with('success', 'Notification settings saved');
     }
 
@@ -65,21 +70,22 @@ class SettingsController extends Controller
     {
         $org = Auth::user()->organizations()->first();
         $tokens = ApiToken::where('organization_id', $org->id)
-                    ->where('user_id', Auth::id())->get();
+            ->where('user_id', Auth::id())->get();
+
         return view('settings.api-tokens', compact('tokens'));
     }
 
     public function createToken(Request $request)
     {
         $data = $request->validate(['name' => 'required|string|max:60']);
-        $org  = Auth::user()->organizations()->first();
+        $org = Auth::user()->organizations()->first();
         abort_if(! $org, 422, 'No organization for current user.');
 
         $token = new ApiToken([
-            'user_id'         => Auth::id(),
+            'user_id' => Auth::id(),
             'organization_id' => $org->id,
-            'name'            => $data['name'],
-            'is_active'       => true,
+            'name' => $data['name'],
+            'is_active' => true,
         ]);
         $token->save();
 
@@ -93,6 +99,7 @@ class SettingsController extends Controller
     public function revokeToken(ApiToken $token)
     {
         $token->update(['is_active' => false]);
+
         return redirect()->back()->with('success', 'Token revoked');
     }
 }

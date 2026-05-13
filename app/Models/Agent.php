@@ -20,11 +20,11 @@ class Agent extends Model
     ];
 
     protected $casts = [
-        'connected_at'      => 'datetime',
-        'disconnected_at'   => 'datetime',
+        'connected_at' => 'datetime',
+        'disconnected_at' => 'datetime',
         'last_heartbeat_at' => 'datetime',
-        'capabilities'      => 'array',
-        'config'            => 'array',
+        'capabilities' => 'array',
+        'config' => 'array',
     ];
 
     public function server()
@@ -54,7 +54,7 @@ class Agent extends Model
         $token = self::generateToken();
 
         $this->forceFill([
-            'token_hash'   => hash('sha256', $token),
+            'token_hash' => hash('sha256', $token),
             'token_prefix' => mb_substr($token, 0, 14),
         ])->save();
 

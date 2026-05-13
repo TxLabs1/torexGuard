@@ -27,7 +27,7 @@ class CommandController
             ->where('status', 'pending')
             ->where(function ($q) use ($agent) {
                 $q->where('server_id', $agent->server_id)
-                  ->orWhereHas('threat', fn ($q) => $q->where('server_id', $agent->server_id));
+                    ->orWhereHas('threat', fn ($q) => $q->where('server_id', $agent->server_id));
             })
             ->orderBy('id')
             ->limit(50)
@@ -39,9 +39,9 @@ class CommandController
 
         return response()->json([
             'commands' => $commands->map(fn ($c) => [
-                'id'        => $c->id,
-                'type'      => $c->type,
-                'target'    => $c->target,
+                'id' => $c->id,
+                'type' => $c->type,
+                'target' => $c->target,
                 'threat_id' => $c->threat_id,
                 'automated' => (bool) $c->is_automated,
             ]),
@@ -53,13 +53,13 @@ class CommandController
         $data = $request->validate([
             'status' => 'required|in:success,failed,rolled_back',
             'result' => 'nullable|string|max:65535',
-            'error'  => 'nullable|string|max:2048',
+            'error' => 'nullable|string|max:2048',
         ]);
 
         $command->update([
-            'status'      => $data['status'],
-            'result'      => $data['result'] ?? null,
-            'error'       => $data['error']  ?? null,
+            'status' => $data['status'],
+            'result' => $data['result'] ?? null,
+            'error' => $data['error'] ?? null,
             'executed_at' => now(),
         ]);
 

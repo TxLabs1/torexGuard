@@ -1,20 +1,22 @@
 <?php
+
 // routes/web.php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AuditController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\ServerController;
-use App\Http\Controllers\ThreatController;
-use App\Http\Controllers\AlertController;
-use App\Http\Controllers\AuditController;
 use App\Http\Controllers\IncidentController;
-use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\ScanController;
+use App\Http\Controllers\NotificationCenterController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\QuarantineController;
+use App\Http\Controllers\ScanController;
+use App\Http\Controllers\ServerController;
+use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\ThreatController;
+use Illuminate\Support\Facades\Route;
 
 // ── Public agent installer endpoints ─────────────────────────
 // These serve the install scripts from disk so customers can
@@ -51,7 +53,7 @@ Route::middleware('guest')->group(function () {
 
 // ── 2FA: challenge during login (no auth middleware yet) ─────
 Route::middleware('guest')->group(function () {
-    Route::get('/login/2fa',  [TwoFactorController::class, 'challenge'])
+    Route::get('/login/2fa', [TwoFactorController::class, 'challenge'])
         ->name('login.2fa.challenge');
     Route::post('/login/2fa', [TwoFactorController::class, 'verifyChallenge'])
         ->middleware('throttle:login')
@@ -133,16 +135,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/audit', [AuditController::class, 'index'])->name('audit.index');
 
     // Notification inbox
-    Route::get('/notifications',                 [\App\Http\Controllers\NotificationCenterController::class, 'index'])->name('notifications.index');
-    Route::get('/notifications/unread.json',     [\App\Http\Controllers\NotificationCenterController::class, 'unread'])->name('notifications.unread');
-    Route::post('/notifications/{id}/read',      [\App\Http\Controllers\NotificationCenterController::class, 'markRead'])->name('notifications.read');
-    Route::post('/notifications/read-all',       [\App\Http\Controllers\NotificationCenterController::class, 'markAllRead'])->name('notifications.read-all');
+    Route::get('/notifications', [NotificationCenterController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread.json', [NotificationCenterController::class, 'unread'])->name('notifications.unread');
+    Route::post('/notifications/{id}/read', [NotificationCenterController::class, 'markRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationCenterController::class, 'markAllRead'])->name('notifications.read-all');
 
     // 2FA management (enrollment / disable for authenticated users)
     Route::prefix('settings/2fa')->name('2fa.')->group(function () {
-        Route::get('/',          [TwoFactorController::class, 'show'])->name('show');
-        Route::post('/confirm',  [TwoFactorController::class, 'confirm'])->name('confirm');
-        Route::post('/disable',  [TwoFactorController::class, 'disable'])->name('disable');
+        Route::get('/', [TwoFactorController::class, 'show'])->name('show');
+        Route::post('/confirm', [TwoFactorController::class, 'confirm'])->name('confirm');
+        Route::post('/disable', [TwoFactorController::class, 'disable'])->name('disable');
     });
 
     // Settings

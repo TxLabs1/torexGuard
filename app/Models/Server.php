@@ -60,17 +60,20 @@ class Server extends Model
 
     public function isOnline(): bool
     {
-        if (!$this->last_heartbeat_at) return false;
+        if (! $this->last_heartbeat_at) {
+            return false;
+        }
+
         return $this->last_heartbeat_at->diffInSeconds(now()) < 120;
     }
 
     public function memoryTotalHuman(): string
     {
-        return round($this->memory_total / 1073741824, 1) . ' GB';
+        return round($this->memory_total / 1073741824, 1).' GB';
     }
 
     public function diskTotalHuman(): string
     {
-        return round($this->disk_total / 1073741824, 1) . ' GB';
+        return round($this->disk_total / 1073741824, 1).' GB';
     }
 }

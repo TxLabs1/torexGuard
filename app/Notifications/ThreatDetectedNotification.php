@@ -25,12 +25,14 @@ class ThreatDetectedNotification extends Notification implements ShouldQueue
             && $this->severityAllowed($settings, $this->threat->severity, 'threat_detected')) {
             $channels[] = 'mail';
         }
+
         return $channels;
     }
 
     public function toMail(object $notifiable): MailMessage
     {
         $url = url('/threats/'.$this->threat->id);
+
         return (new MailMessage)
             ->subject('['.strtoupper($this->threat->severity).'] Threat detected: '.$this->threat->title)
             ->greeting('Threat detected on '.($this->threat->server->hostname ?? 'unknown server'))
@@ -44,13 +46,13 @@ class ThreatDetectedNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'type'      => 'threat_detected',
+            'type' => 'threat_detected',
             'threat_id' => $this->threat->threat_id,
-            'severity'  => $this->threat->severity,
-            'title'     => $this->threat->title,
-            'project_id'=> $this->threat->project_id,
+            'severity' => $this->threat->severity,
+            'title' => $this->threat->title,
+            'project_id' => $this->threat->project_id,
             'server_id' => $this->threat->server_id,
-            'url'       => '/threats/'.$this->threat->id,
+            'url' => '/threats/'.$this->threat->id,
         ];
     }
 
@@ -62,6 +64,7 @@ class ThreatDetectedNotification extends Notification implements ShouldQueue
         }
         $threshold = $settings->severity_threshold[$event] ?? 'medium';
         $weights = ['low' => 1, 'medium' => 2, 'high' => 3, 'critical' => 4];
+
         return ($weights[$severity] ?? 0) >= ($weights[$threshold] ?? 2);
     }
 }

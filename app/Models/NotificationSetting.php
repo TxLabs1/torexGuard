@@ -21,10 +21,10 @@ class NotificationSetting extends Model
     ];
 
     protected $casts = [
-        'email_enabled'    => 'boolean',
-        'slack_enabled'    => 'boolean',
-        'webhook_enabled'  => 'boolean',
-        'notify_on'        => 'array',
+        'email_enabled' => 'boolean',
+        'slack_enabled' => 'boolean',
+        'webhook_enabled' => 'boolean',
+        'notify_on' => 'array',
         'severity_threshold' => 'array',
     ];
 

@@ -17,9 +17,13 @@ class ThreatIngestionTest extends TestCase
     use RefreshDatabase;
 
     private string $agentToken;
+
     private Project $project;
+
     private Server $server;
+
     private Organization $org;
+
     private User $owner;
 
     protected function setUp(): void
@@ -27,29 +31,29 @@ class ThreatIngestionTest extends TestCase
         parent::setUp();
         OrganizationContext::asSystem();
 
-        $this->org   = Organization::create(['name' => 'Acme', 'slug' => 'acme']);
+        $this->org = Organization::create(['name' => 'Acme', 'slug' => 'acme']);
         $this->owner = User::factory()->create();
         $this->org->users()->attach($this->owner->id, ['role' => 'admin']);
 
         $this->project = Project::create([
             'organization_id' => $this->org->id,
-            'user_id'         => $this->owner->id,
-            'name'            => 'P', 'slug' => 'p', 'status' => 'active',
+            'user_id' => $this->owner->id,
+            'name' => 'P', 'slug' => 'p', 'status' => 'active',
         ]);
         $this->project->issueApiKey();
 
         $this->server = Server::create([
             'organization_id' => $this->org->id,
-            'project_id'      => $this->project->id,
-            'name'            => 'srv', 'hostname' => 'srv', 'os' => 'linux', 'status' => 'online',
+            'project_id' => $this->project->id,
+            'name' => 'srv', 'hostname' => 'srv', 'os' => 'linux', 'status' => 'online',
         ]);
 
         $agent = Agent::create([
             'project_id' => $this->project->id,
-            'server_id'  => $this->server->id,
-            'agent_id'   => 'agt_test',
-            'status'     => 'active',
-            'version'    => '1.0.0',
+            'server_id' => $this->server->id,
+            'agent_id' => 'agt_test',
+            'status' => 'active',
+            'version' => '1.0.0',
         ]);
         $this->agentToken = $agent->issueToken();
 
@@ -59,11 +63,11 @@ class ThreatIngestionTest extends TestCase
     public function test_agent_can_report_a_threat(): void
     {
         $r = $this->postJson('/api/v1/agent/threats', [
-            'type'             => 'malware',
-            'severity'         => 'high',
-            'title'            => 'eval base64',
-            'file_path'        => '/var/www/x.php',
-            'source_ip'        => '1.2.3.4',
+            'type' => 'malware',
+            'severity' => 'high',
+            'title' => 'eval base64',
+            'file_path' => '/var/www/x.php',
+            'source_ip' => '1.2.3.4',
         ], ['Authorization' => 'Bearer '.$this->agentToken]);
 
         $r->assertCreated();
@@ -76,9 +80,9 @@ class ThreatIngestionTest extends TestCase
     public function test_agent_endpoints_are_token_protected(): void
     {
         $this->postJson('/api/v1/agent/threats', [
-            'type'     => 'malware',
+            'type' => 'malware',
             'severity' => 'high',
-            'title'    => 'no auth',
+            'title' => 'no auth',
         ], ['Authorization' => 'Bearer not-real'])->assertStatus(401);
     }
 }

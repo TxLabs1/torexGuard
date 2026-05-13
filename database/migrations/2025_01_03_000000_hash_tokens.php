@@ -29,8 +29,8 @@ return new class extends Migration
         DB::table('projects')->orderBy('id')->chunkById(500, function ($rows) {
             foreach ($rows as $row) {
                 DB::table('projects')->where('id', $row->id)->update([
-                    'api_key_hash'    => hash('sha256', (string) $row->api_key),
-                    'api_key_prefix'  => mb_substr((string) $row->api_key, 0, 11),
+                    'api_key_hash' => hash('sha256', (string) $row->api_key),
+                    'api_key_prefix' => mb_substr((string) $row->api_key, 0, 11),
                     'api_secret_hash' => hash('sha256', (string) $row->api_secret),
                 ]);
             }
@@ -55,7 +55,7 @@ return new class extends Migration
         DB::table('agents')->orderBy('id')->chunkById(500, function ($rows) {
             foreach ($rows as $row) {
                 DB::table('agents')->where('id', $row->id)->update([
-                    'token_hash'   => hash('sha256', (string) $row->token),
+                    'token_hash' => hash('sha256', (string) $row->token),
                     'token_prefix' => mb_substr((string) $row->token, 0, 14),
                 ]);
             }
@@ -79,7 +79,7 @@ return new class extends Migration
         DB::table('api_tokens')->orderBy('id')->chunkById(500, function ($rows) {
             foreach ($rows as $row) {
                 DB::table('api_tokens')->where('id', $row->id)->update([
-                    'token_hash'   => hash('sha256', (string) $row->token),
+                    'token_hash' => hash('sha256', (string) $row->token),
                     'token_prefix' => mb_substr((string) $row->token, 0, 12),
                 ]);
             }

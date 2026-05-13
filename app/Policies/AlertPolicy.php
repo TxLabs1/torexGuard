@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class AlertPolicy extends OrgScopedPolicy
-{
-}
+class AlertPolicy extends OrgScopedPolicy {}

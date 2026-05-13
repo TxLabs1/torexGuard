@@ -63,15 +63,15 @@ return [
         // Dedicated S3-compatible bucket for spatie/laravel-backup archives.
         // Set BACKUP_S3_* env vars to point at e.g. Backblaze B2 or Hetzner.
         'backups' => [
-            'driver'                  => 's3',
-            'key'                     => env('BACKUP_S3_KEY'),
-            'secret'                  => env('BACKUP_S3_SECRET'),
-            'region'                  => env('BACKUP_S3_REGION', 'us-east-1'),
-            'bucket'                  => env('BACKUP_S3_BUCKET'),
-            'endpoint'                => env('BACKUP_S3_ENDPOINT'),
+            'driver' => 's3',
+            'key' => env('BACKUP_S3_KEY'),
+            'secret' => env('BACKUP_S3_SECRET'),
+            'region' => env('BACKUP_S3_REGION', 'us-east-1'),
+            'bucket' => env('BACKUP_S3_BUCKET'),
+            'endpoint' => env('BACKUP_S3_ENDPOINT'),
             'use_path_style_endpoint' => (bool) env('BACKUP_S3_PATH_STYLE', true),
-            'throw'                   => false,
-            'report'                  => false,
+            'throw' => false,
+            'report' => false,
         ],
 
     ],

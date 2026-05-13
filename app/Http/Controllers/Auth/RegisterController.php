@@ -20,22 +20,22 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'name'              => 'required|string|max:100',
-            'email'             => 'required|email|unique:users,email',
-            'password'          => 'required|string|min:8|confirmed',
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
             'organization_name' => 'required|string|max:100',
         ]);
 
         $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
+            'name' => $validated['name'],
+            'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role'     => 'admin',
+            'role' => 'admin',
         ]);
 
         $org = Organization::create([
             'name' => $validated['organization_name'],
-            'slug' => Str::slug($validated['organization_name']) . '-' . Str::random(6),
+            'slug' => Str::slug($validated['organization_name']).'-'.Str::random(6),
             'plan' => 'free',
         ]);
 

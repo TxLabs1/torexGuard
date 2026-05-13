@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\QuarantineFile;
-use Illuminate\Support\Facades\Auth;
 
 class QuarantineController extends Controller
 {

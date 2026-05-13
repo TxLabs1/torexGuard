@@ -2,6 +2,4 @@
 
 namespace App\Policies;
 
-class ServerPolicy extends OrgScopedPolicy
-{
-}
+class ServerPolicy extends OrgScopedPolicy {}

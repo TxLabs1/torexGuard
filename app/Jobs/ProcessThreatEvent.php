@@ -8,18 +8,19 @@ use App\Models\ThreatEvent;
 use App\Notifications\ThreatDetectedNotification;
 use App\Services\ThreatResponseService;
 use App\Support\OrganizationContext;
-use Illuminate\Support\Facades\Notification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Notification;
 
 class ProcessThreatEvent implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public int $tries = 3;
+
     public int $timeout = 30;
 
     public function __construct(private ThreatEvent $event)
@@ -43,19 +44,19 @@ class ProcessThreatEvent implements ShouldQueue
 
             if (! $existingThreat) {
                 $threat = Threat::create([
-                    'threat_id'        => Threat::generateThreatId(),
-                    'project_id'       => $this->event->project_id,
-                    'server_id'        => $this->event->server_id,
-                    'organization_id'  => $this->event->project->organization_id,
-                    'type'             => $this->mapEventTypeToThreatType($this->event->type),
-                    'severity'         => $this->event->severity === 'critical' ? 'critical' : 'high',
-                    'title'            => $this->buildThreatTitle($this->event->type, $payload),
-                    'description'      => 'Auto-escalated from event: '.$this->event->event_id,
-                    'file_path'        => $payload['file_path'] ?? null,
-                    'source_ip'        => $payload['source_ip'] ?? null,
+                    'threat_id' => Threat::generateThreatId(),
+                    'project_id' => $this->event->project_id,
+                    'server_id' => $this->event->server_id,
+                    'organization_id' => $this->event->project->organization_id,
+                    'type' => $this->mapEventTypeToThreatType($this->event->type),
+                    'severity' => $this->event->severity === 'critical' ? 'critical' : 'high',
+                    'title' => $this->buildThreatTitle($this->event->type, $payload),
+                    'description' => 'Auto-escalated from event: '.$this->event->event_id,
+                    'file_path' => $payload['file_path'] ?? null,
+                    'source_ip' => $payload['source_ip'] ?? null,
                     'confidence_score' => 75,
-                    'status'           => 'active',
-                    'detected_at'      => $this->event->occurred_at,
+                    'status' => 'active',
+                    'detected_at' => $this->event->occurred_at,
                 ]);
 
                 broadcast(new ThreatDetected($threat));
@@ -79,28 +80,29 @@ class ProcessThreatEvent implements ShouldQueue
     private function isThreatIndicator(string $type, string $severity): bool
     {
         $threatEvents = ['file_created', 'suspicious_process', 'outbound_connection', 'privilege_escalation'];
+
         return in_array($type, $threatEvents) && in_array($severity, ['high', 'critical']);
     }
 
     private function mapEventTypeToThreatType(string $eventType): string
     {
-        return match($eventType) {
+        return match ($eventType) {
             'file_created', 'file_modified' => 'file_modification',
-            'suspicious_process'            => 'suspicious_process',
-            'outbound_connection'           => 'outbound_connection',
-            'privilege_escalation'          => 'privilege_escalation',
-            default                         => 'other',
+            'suspicious_process' => 'suspicious_process',
+            'outbound_connection' => 'outbound_connection',
+            'privilege_escalation' => 'privilege_escalation',
+            default => 'other',
         };
     }
 
     private function buildThreatTitle(string $type, array $payload): string
     {
-        return match($type) {
-            'file_created'         => 'Suspicious file created: ' . basename($payload['file_path'] ?? 'unknown'),
-            'suspicious_process'   => 'Suspicious process: ' . ($payload['process_name'] ?? 'unknown'),
-            'outbound_connection'  => 'Suspicious outbound connection to ' . ($payload['destination'] ?? 'unknown'),
+        return match ($type) {
+            'file_created' => 'Suspicious file created: '.basename($payload['file_path'] ?? 'unknown'),
+            'suspicious_process' => 'Suspicious process: '.($payload['process_name'] ?? 'unknown'),
+            'outbound_connection' => 'Suspicious outbound connection to '.($payload['destination'] ?? 'unknown'),
             'privilege_escalation' => 'Privilege escalation attempt detected',
-            default                => 'Security event: ' . str_replace('_', ' ', $type),
+            default => 'Security event: '.str_replace('_', ' ', $type),
         };
     }
 }

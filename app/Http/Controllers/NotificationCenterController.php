@@ -30,11 +30,11 @@ class NotificationCenterController extends Controller
                 ->limit(10)
                 ->get()
                 ->map(fn ($n) => [
-                    'id'         => $n->id,
-                    'type'       => $n->data['type']  ?? 'notification',
-                    'title'      => $n->data['title'] ?? ($n->data['hostname'] ?? null) ?? 'Notification',
-                    'url'        => $n->data['url']   ?? '#',
-                    'severity'   => $n->data['severity'] ?? null,
+                    'id' => $n->id,
+                    'type' => $n->data['type'] ?? 'notification',
+                    'title' => $n->data['title'] ?? ($n->data['hostname'] ?? null) ?? 'Notification',
+                    'url' => $n->data['url'] ?? '#',
+                    'severity' => $n->data['severity'] ?? null,
                     'created_at' => $n->created_at?->diffForHumans(),
                 ]),
         ]);

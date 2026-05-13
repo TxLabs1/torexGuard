@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Models\Organization;
 use App\Models\User;
 use App\Services\TwoFactorService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,12 +16,12 @@ class AuthFlowTest extends TestCase
     public function test_user_can_log_in_with_correct_credentials_when_2fa_disabled(): void
     {
         $user = User::factory()->create([
-            'email'    => 'alice@example.com',
+            'email' => 'alice@example.com',
             'password' => Hash::make('correct-horse-battery'),
         ]);
 
         $this->post('/login', [
-            'email'    => 'alice@example.com',
+            'email' => 'alice@example.com',
             'password' => 'correct-horse-battery',
         ])->assertRedirect();
 
@@ -32,9 +31,9 @@ class AuthFlowTest extends TestCase
     public function test_user_with_2fa_must_satisfy_challenge(): void
     {
         /** @var TwoFactorService $tfa */
-        $tfa  = app(TwoFactorService::class);
+        $tfa = app(TwoFactorService::class);
         $user = User::factory()->create([
-            'email'    => 'bob@example.com',
+            'email' => 'bob@example.com',
             'password' => Hash::make('password123'),
         ]);
 
@@ -42,7 +41,7 @@ class AuthFlowTest extends TestCase
         $tfa->confirm($user->fresh());
 
         $this->post('/login', [
-            'email'    => 'bob@example.com',
+            'email' => 'bob@example.com',
             'password' => 'password123',
         ])->assertRedirect(route('login.2fa.challenge'));
 

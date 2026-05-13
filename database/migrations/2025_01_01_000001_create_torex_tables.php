@@ -103,7 +103,7 @@ return new class extends Migration
                 'backdoor', 'obfuscated_code', 'suspicious_upload',
                 'process_injection', 'privilege_escalation', 'brute_force',
                 'sql_injection', 'xss', 'rce', 'file_modification',
-                'suspicious_process', 'outbound_connection', 'other'
+                'suspicious_process', 'outbound_connection', 'other',
             ])->default('other');
             $table->enum('severity', ['low', 'medium', 'high', 'critical'])->default('medium');
             $table->enum('status', ['active', 'investigating', 'quarantined', 'resolved', 'false_positive'])->default('active');
@@ -187,7 +187,7 @@ return new class extends Migration
             $table->enum('type', [
                 'quarantine_file', 'delete_file', 'chmod_lock',
                 'kill_process', 'block_ip', 'disable_endpoint',
-                'restore_file', 'send_alert', 'lock_environment'
+                'restore_file', 'send_alert', 'lock_environment',
             ]);
             $table->enum('status', ['pending', 'executing', 'success', 'failed', 'rolled_back'])->default('pending');
             $table->boolean('is_automated')->default(false);

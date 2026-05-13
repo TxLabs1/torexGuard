@@ -28,11 +28,11 @@ class ServerStatusChanged implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-            'id'       => $this->server->id,
+            'id' => $this->server->id,
             'hostname' => $this->server->hostname,
             'previous' => $this->previous,
-            'current'  => $this->current,
-            'at'       => now()->toIso8601String(),
+            'current' => $this->current,
+            'at' => now()->toIso8601String(),
         ];
     }
 }
