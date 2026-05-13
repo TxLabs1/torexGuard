@@ -1,0 +1,164 @@
+# docker/docker-compose.yml -- DEVELOPMENT stack
+# Run from the project root:  docker compose -f docker/docker-compose.yml up
+#
+# This stack uses bind-mounts and `php artisan serve` so source changes are
+# reflected without rebuilding. For production see docker-compose.prod.yml.
+
+services:
+
+  # ── Laravel App (PHP-FPM-less dev runtime) ───────────────────
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: torex_guard_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV:             local
+      APP_DEBUG:           "true"
+      APP_URL:             http://localhost:8000
+      DB_CONNECTION:       mysql
+      DB_HOST:             mysql
+      DB_PORT:             "3306"
+      DB_DATABASE:         torexguard
+      DB_USERNAME:         torex
+      DB_PASSWORD:         torex_secret
+      REDIS_CLIENT:        phpredis
+      REDIS_HOST:          redis
+      REDIS_PORT:          "6379"
+      BROADCAST_CONNECTION: reverb
+      QUEUE_CONNECTION:    redis
+      SESSION_DRIVER:      redis
+      CACHE_STORE:         redis
+      REVERB_HOST:         0.0.0.0
+      REVERB_PORT:         "8080"
+      REVERB_SERVER_HOST:  0.0.0.0
+      REVERB_SERVER_PORT:  "8080"
+      REVERB_SCHEME:       http
+    volumes:
+      - ..:/var/www/html
+      - vendor_cache:/var/www/html/vendor
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks: [torex_net]
+
+  # ── Queue worker ─────────────────────────────────────────────
+  queue:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: torex_guard_queue
+    restart: unless-stopped
+    command: php artisan queue:work redis --sleep=3 --tries=3 --timeout=90 --backoff=10
+    environment: &app_env
+      APP_ENV:        local
+      APP_DEBUG:      "true"
+      DB_CONNECTION:  mysql
+      DB_HOST:        mysql
+      DB_DATABASE:    torexguard
+      DB_USERNAME:    torex
+      DB_PASSWORD:    torex_secret
+      REDIS_CLIENT:   phpredis
+      REDIS_HOST:     redis
+    volumes:
+      - ..:/var/www/html
+      - vendor_cache:/var/www/html/vendor
+    depends_on: [app, mysql, redis]
+    networks: [torex_net]
+
+  # ── Horizon dashboard / supervisor ───────────────────────────
+  horizon:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: torex_guard_horizon
+    restart: unless-stopped
+    command: php artisan horizon
+    environment: *app_env
+    volumes:
+      - ..:/var/www/html
+      - vendor_cache:/var/www/html/vendor
+    depends_on: [app, redis]
+    networks: [torex_net]
+
+  # ── Reverb WebSocket server ──────────────────────────────────
+  reverb:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: development
+    container_name: torex_guard_reverb
+    restart: unless-stopped
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    ports:
+      - "8080:8080"
+    environment:
+      <<: *app_env
+      REVERB_HOST:        0.0.0.0
+      REVERB_PORT:        "8080"
+      REVERB_SERVER_HOST: 0.0.0.0
+      REVERB_SERVER_PORT: "8080"
+    volumes:
+      - ..:/var/www/html
+      - vendor_cache:/var/www/html/vendor
+    depends_on: [app]
+    networks: [torex_net]
+
+  # ── MySQL 8 ──────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.4
+    container_name: torex_guard_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: torex_root
+      MYSQL_DATABASE:      torexguard
+      MYSQL_USER:          torex
+      MYSQL_PASSWORD:      torex_secret
+    command: >
+      --default-authentication-plugin=caching_sha2_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "torex", "-ptorex_secret"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [torex_net]
+
+  # ── Redis 7 ──────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: torex_guard_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [torex_net]
+
+networks:
+  torex_net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  vendor_cache:

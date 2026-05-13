@@ -1,0 +1,21 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+        - config/
+        - database/factories/
+        - database/seeders/
+
+    level: 5
+
+    excludePaths:
+        - vendor/*
+        - bootstrap/cache/*
+        - storage/*
+
+    checkMissingIterableValueType: false
+    checkModelProperties: true
+
+    ignoreErrors: []

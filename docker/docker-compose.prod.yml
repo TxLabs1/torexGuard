@@ -1,0 +1,164 @@
+# docker/docker-compose.prod.yml -- PRODUCTION stack
+#
+# Run from project root:
+#     docker compose -f docker/docker-compose.prod.yml up -d
+#
+# All sensitive values come from `.env` (loaded by compose `env_file:`).
+# Caddy fronts the application with automatic Let's Encrypt TLS. Reverb is
+# proxied for `/app/`. The Spatie backup runner runs on a 1-minute cron loop
+# inside its own container so the host doesn't need cron.
+
+x-app-image: &app-image
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile
+    target: production
+  image: torexguard/app:${APP_IMAGE_TAG:-latest}
+
+x-app-env: &app-env
+  env_file: ../.env
+  environment:
+    APP_ENV: production
+    LOG_CHANNEL: stderr
+
+services:
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: torex_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    networks: [torex_net]
+
+  app:
+    <<: [*app-image, *app-env]
+    container_name: torex_app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/up || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 30s
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_geoip:/var/www/html/database/geoip
+    networks: [torex_net]
+
+  queue:
+    <<: [*app-image, *app-env]
+    container_name: torex_queue
+    restart: unless-stopped
+    command: php artisan queue:work redis --sleep=3 --tries=3 --timeout=120 --backoff=10
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_geoip:/var/www/html/database/geoip
+    networks: [torex_net]
+
+  horizon:
+    <<: [*app-image, *app-env]
+    container_name: torex_horizon
+    restart: unless-stopped
+    command: php artisan horizon
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - app_storage:/var/www/html/storage
+    networks: [torex_net]
+
+  reverb:
+    <<: [*app-image, *app-env]
+    container_name: torex_reverb
+    restart: unless-stopped
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    expose:
+      - "8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks: [torex_net]
+
+  scheduler:
+    <<: [*app-image, *app-env]
+    container_name: torex_scheduler
+    restart: unless-stopped
+    command: ["sh", "-c", "while true; do php artisan schedule:run --verbose --no-interaction & sleep 60; done"]
+    depends_on:
+      redis:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    volumes:
+      - app_storage:/var/www/html/storage
+      - app_geoip:/var/www/html/database/geoip
+    networks: [torex_net]
+
+  mysql:
+    image: mysql:8.4
+    container_name: torex_mysql
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE:      ${DB_DATABASE}
+      MYSQL_USER:          ${DB_USERNAME}
+      MYSQL_PASSWORD:      ${DB_PASSWORD}
+    command: >
+      --default-authentication-plugin=caching_sha2_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --innodb-buffer-pool-size=512M
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_USERNAME}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [torex_net]
+
+  redis:
+    image: redis:7-alpine
+    container_name: torex_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks: [torex_net]
+
+networks:
+  torex_net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:
+  app_storage:
+  app_geoip:
+  caddy_data:
+  caddy_config:
