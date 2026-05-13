@@ -63,9 +63,9 @@ return [
 
         'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
         'mail' => [
-            'to'   => env('BACKUP_NOTIFICATION_EMAIL', env('MAIL_FROM_ADDRESS', 'ops@example.com')),
+            'to'   => env('BACKUP_NOTIFICATION_EMAIL') ?: (env('MAIL_FROM_ADDRESS') ?: 'ops@example.com'),
             'from' => [
-                'address' => env('MAIL_FROM_ADDRESS', 'ops@example.com'),
+                'address' => env('MAIL_FROM_ADDRESS') ?: 'ops@example.com',
                 'name'    => env('MAIL_FROM_NAME', 'Torex Guard'),
             ],
         ],
