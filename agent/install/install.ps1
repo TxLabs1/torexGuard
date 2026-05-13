@@ -12,7 +12,7 @@ param(
     [string] $Host    = "https://guard.torexlabs.cloud",
     [string] $Version = "",
     [string] $Prefix  = "$env:ProgramFiles\TorexGuard",
-    [string] $Repo    = "torexlabs/torex-guard"
+    [string] $Repo    = "TxLabs1/torexGuard"
 )
 
 $ErrorActionPreference = "Stop"

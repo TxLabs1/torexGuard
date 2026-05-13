@@ -16,7 +16,7 @@
 
 set -euo pipefail
 
-GITHUB_REPO="${TOREX_RELEASE_REPO:-torexlabs/torex-guard}"
+GITHUB_REPO="${TOREX_RELEASE_REPO:-TxLabs1/torexGuard}"
 PREFIX="/usr/local"
 VERSION=""
 API_KEY=""

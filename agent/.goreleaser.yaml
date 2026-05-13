@@ -51,8 +51,7 @@ changelog:
       - "^chore:"
 
 release:
-  github:
-    owner: torexlabs
-    name: torex-guard
+  # Owner/name are auto-detected from the repo running the workflow,
+  # so the same config works for forks and the upstream repo.
   draft: false
   prerelease: auto
